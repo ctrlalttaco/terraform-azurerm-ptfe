@@ -1,5 +1,7 @@
 # PTFE Azure Module
 
+This repo contains a module for how to deploy Private Terraform Enterprise (PTFE) on Azure. The intention, based on how PTFE currently functions, is to build a single-node Azure Scaling Set with an Azure Load Balancer acting as the endpoint.
+
 ## Required Input Variables
 
 | Variable | Default Value | Description |

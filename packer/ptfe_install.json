@@ -1,5 +1,0 @@
-{
-    "description": "This is a basic packer file for building an Azure VM image containing airgapped PTFE",
-    "variables": {
-    }
-}
