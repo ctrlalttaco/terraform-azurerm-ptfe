@@ -1,0 +1,14 @@
+REPLICATED_URL = ENV['REPLICATED_URL']
+TFE_URL = ENV['TFE_URL']
+LICENSE_URL = ENV['LICENSE_URL']
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/bionic64"
+    config.vm.provision "shell",
+        path: "install_files/install-ptfe.sh",
+        env: {
+            'REPLICATED_URL' => REPLICATED_URL,
+            'TFE_URL' => TFE_URL,
+            'LICENSE_URL' => LICENSE_URL
+        }
+end
