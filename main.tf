@@ -2,12 +2,24 @@ terraform {
   required_version = "~> 0.11.11"
 }
 
+/*------------------------------------------------------------------------------
+  Provider
+  Use the following ENV vars:
+    ARM_SUBSCRIPTION_ID
+    ARM_CLIENT_ID
+    ARM_CLIENT_SECRET
+    ARM_TENANT_ID
+------------------------------------------------------------------------------*/
 provider "azurerm" {
   version = "~> 1.21.0"
 }
 
+/*------------------------------------------------------------------------------
+The Private Terraform Enterprise components are split into three resource groups
+based on the best practice of Microsoft as documented [here](https://docs.microsoft.com/en-us/azure/architecture/cloud-adoption/appendix/azure-scaffold#resource-groups).
+------------------------------------------------------------------------------*/
 resource "azurerm_resource_group" "tfe" {
-  name     = "${var.environment}-tfe"
+  name     = "${var.resource_group_name}"
   location = "${var.location}"
 }
 
@@ -20,7 +32,7 @@ data "template_file" "custom_data" {
 }
 
 resource "azurerm_virtual_machine_scale_set" "tfe" {
-  name                = "${var.environment}-tfe"
+  name                = "${var.vm_scale_set_name}"
   location            = "${azurerm_resource_group.tfe.location}"
   resource_group_name = "${azurerm_resource_group.tfe.name}"
   upgrade_policy_mode = "manual"
@@ -32,7 +44,7 @@ resource "azurerm_virtual_machine_scale_set" "tfe" {
   }
 
   boot_diagnostics {
-    enabled     = true
+    enabled     = "${var.enable_boot_diagnostics}"
     storage_uri = "${var.boot_diagnostics_storage_endpoint}"
   }
 
@@ -77,10 +89,6 @@ resource "azurerm_virtual_machine_scale_set" "tfe" {
       application_security_group_ids         = ["${azurerm_application_security_group.tfe.id}"]
     }
   }
-
-  tags {
-    environment = "${var.environment}"
-  }
 }
 
 locals {
@@ -88,17 +96,13 @@ locals {
 }
 
 resource "azurerm_lb" "tfe_private" {
-  name                = "${var.environment}-tfe-private-lb"
+  name                = "${var.lb_name}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.tfe.name}"
 
   frontend_ip_configuration {
     name      = "${local.private_frontend_pool_name}"
     subnet_id = "${var.subnet_id}"
-  }
-
-  tags {
-    environment = "${var.environment}"
   }
 }
 
@@ -166,11 +170,7 @@ resource "azurerm_lb_rule" "tfe_private_setup" {
 }
 
 resource "azurerm_application_security_group" "tfe" {
-  name                = "${var.environment}-tfe-asg"
+  name                = "${var.app_security_group_name}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.tfe.name}"
-
-  tags {
-    environment = "${var.environment}"
-  }
 }

@@ -1,0 +1,17 @@
+---
+driver:
+  name: terraform
+  root_module_directory: test/fixtures/module
+  
+provisioner:
+  name: terraform
+
+platforms:
+  - name: terraform
+
+verifier:
+  name: terraform
+
+suites:
+  - name: azure
+  

@@ -1,6 +1,9 @@
 .vagrant/
 .terraform/
+.kitchen/
+.terraform.tfstate*
 *.log
 *.tfvars
 *.tfstate
 *.tfstate.backup
+terraform.tfstate.d/
